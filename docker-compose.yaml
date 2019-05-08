@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  server:
+    image: greggu/icedemo-server:0.1
+    build: 
+      context: .
+      dockerfile: ./server/Dockerfile
+    networks:
+      icedemo:
+    ports:
+      - "8000:8000"
+  client:
+    image: greggu/icedemo-client:0.1
+    build: 
+      context: .
+      dockerfile: ./client/Dockerfile
+    networks:
+      icedemo:
+
+
+networks:
+  icedemo:
