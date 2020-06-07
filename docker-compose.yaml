@@ -3,21 +3,61 @@ version: "3"
 services:
   server:
     image: greggu/icedemo-server:0.1
-    build: 
+    hostname: server
+    build:
       context: .
       dockerfile: ./server/Dockerfile
     networks:
       icedemo:
     ports:
       - "8000:8000"
-  client:
-    image: greggu/icedemo-client:0.1
-    build: 
+  # client:
+  #   image: greggu/icedemo-client:0.1
+  #   hostname: client
+  #   build:
+  #     context: .
+  #     dockerfile: ./client/Dockerfile
+  #   networks:
+  #     icedemo:
+  #   restart: always
+  locust-master:
+    image: greggu/icedemo-locust-master:0.1
+    hostname: locust-master
+    build:
       context: .
-      dockerfile: ./client/Dockerfile
+      dockerfile: ./locust/Dockerfile
+    command:
+      [
+        "locust",
+        "--master",
+        "-f",
+        "locustfile.py",
+        "--host",
+        "server"
+      ]
+    ports:
+      - 8089:8089         
     networks:
       icedemo:
-
+  locust-worker:
+    image: greggu/icedemo-locust-worker:0.1
+    hostname: locust-worker
+    build:
+      context: .
+      dockerfile: ./locust/Dockerfile
+    command:
+      [
+        "locust",
+        "-f",
+        "locustfile.py",
+        "--worker",
+        "--master-host",
+        "locust-master",
+        "--host",
+        "server"
+      ]
+    networks:
+      icedemo:
 
 networks:
   icedemo:
